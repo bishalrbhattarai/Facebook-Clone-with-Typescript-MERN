@@ -1,0 +1,210 @@
+import {
+  Box,
+  Avatar,
+  Typography,
+  Button,
+  Divider,
+  CircularProgress,
+} from "@mui/material";
+import CellTowerIcon from "@mui/icons-material/CellTower";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import { useParams } from "react-router-dom";
+import { useAppSelector } from "../hooks/hook";
+import { useState, useEffect } from "react";
+import apiClient from "../http/apiClient";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import SmsIcon from "@mui/icons-material/Sms";
+
+const button = { color: "white" };
+
+// interface UserProfileProps {
+//   _id: string;
+//   firstName: string;
+//   lastName: string;
+//   avatar: string;
+//   cover: string;
+//   friends: string[];
+//   pendingFriends: string[];
+//   friendRequests: string[];
+// }
+
+const Profile = () => {
+  const { id } = useParams<{ id: string }>();
+  const loggedInUser = useAppSelector((state) => state.user.user);
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const fetchUserProfile = async () => {
+    try {
+      setLoading(true);
+      const { data } = await apiClient.post("/user", { id });
+      setUser(data.user);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // if (id)
+    fetchUserProfile();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <CircularProgress color="inherit" />
+      </Box>
+    );
+  }
+
+  if (!user) {
+    return <Typography>User not found</Typography>;
+  }
+
+  const isFriend = user.friends.includes(loggedInUser?._id);
+  const isPending = user.pendingFriends.includes(loggedInUser?._id);
+  const isRequested = user.friendRequests.includes(loggedInUser?._id);
+
+  return (
+    <>
+      <Box
+        sx={{
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          bgcolor: "#1c1e21",
+          width: "100%",
+        }}
+      >
+        <Box
+          sx={{
+            position: "relative",
+            height: "470px",
+            width: "75%",
+            objectPosition: "center",
+            objectFit: "cover",
+            borderRadius: "10px",
+          }}
+          src={user.cover}
+          component={"img"}
+        />
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 20,
+            alignItems: "center",
+          }}
+        >
+          <Box
+            sx={{
+              alignItems: "center",
+              color: "white",
+              display: "flex",
+              gap: 3,
+            }}
+          >
+            <Avatar
+              src={user.avatar}
+              sx={{
+                border: "4px solid grey",
+                height: "188px",
+                width: "188px",
+                position: "relative",
+                bottom: 25,
+              }}
+            />
+            <Box>
+              <Typography
+                fontSize={35}
+              >{`${user.firstName} ${user.lastName}`}</Typography>
+              <Typography>{user.friends.length} Friends</Typography>
+              <Box display="flex">
+                {user.friends.slice(0, 4).map((friend: any, index: number) => (
+                  <Avatar key={index} sx={{ height: "30px", width: "30px" }}>
+                    {friend[0]}
+                  </Avatar>
+                ))}
+              </Box>
+            </Box>
+          </Box>
+          <Box sx={{ display: "flex", gap: 3 }}>
+            {isFriend ? (
+              <>
+                <Button variant="contained" sx={{ bgcolor: "grey" }}>
+                  Friends
+                </Button>
+                <Button variant="contained" color="error">
+                  Remove Friend
+                </Button>
+              </>
+            ) : isPending ? (
+              <Button variant="contained" sx={{ bgcolor: "grey" }}>
+                Pending Request
+              </Button>
+            ) : isRequested ? (
+              <Button variant="contained" sx={{ bgcolor: "grey" }}>
+                Requested
+              </Button>
+            ) : (
+              <>
+                <Button
+                  startIcon={<PersonAddIcon />}
+                  variant="contained"
+                  sx={{ bgcolor: "#2c2c2e" }}
+                >
+                  Add Friend
+                </Button>
+
+                <Button
+                  variant="contained"
+                  color="error"
+                  // sx={{ bgcolor: "grey" }}
+                >
+                  Remove Friend
+                </Button>
+              </>
+            )}
+            <Button startIcon={<SmsIcon />} variant="contained">
+              Message
+            </Button>
+            <Button
+              startIcon={<CellTowerIcon />}
+              variant="contained"
+              sx={{ bgcolor: "grey", visibility: "hidden" }}
+            >
+              Advertise
+            </Button>
+          </Box>
+        </Box>
+      </Box>
+      <Divider sx={{ border: "1px solid #333" }} />
+
+      <Box
+        display="flex"
+        bgcolor="#1c1e21"
+        sx={{ justifyContent: "center", gap: 2, color: "white" }}
+      >
+        <Box>
+          <Button sx={button}>Posts</Button>
+          <Button sx={button}>About</Button>
+          <Button sx={button}>Photos</Button>
+          <Button sx={button}>
+            <MoreHorizIcon />
+          </Button>
+        </Box>
+      </Box>
+    </>
+  );
+};
+
+export default Profile;
