@@ -5,12 +5,15 @@ import CreateAccount from "./pages/CreateAccount";
 import Profile from "./pages/Profile";
 import Layout from "./Layout";
 import UserProfile from "./pages/UserProfile";
+import Flex from "./component/Flex";
 
 function App() {
   return (
     <>
       <BrowserRouter>
         <Routes>
+          <Route path="/flex" element={<Flex />} />
+
           <Route path="/" element={<Layout />}>
             <Route path="profile" element={<Profile />} />
             <Route path="profile/:id" element={<UserProfile />} />

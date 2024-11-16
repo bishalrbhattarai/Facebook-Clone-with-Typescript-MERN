@@ -19,6 +19,14 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 
+//
+
+app.get("/", (req, res) => {
+  res.json({ msg: "Grape" });
+});
+
+//
+
 import authRoutes from "./routes/auth.route";
 import postRoutes from "./routes/post.route";
 import userRoutes from "./routes/user.route";

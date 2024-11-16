@@ -13,8 +13,6 @@ root.render(
   <StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        {" "}
-        {/* Wrap App with PersistGate */}
         <App />
       </PersistGate>
     </Provider>
