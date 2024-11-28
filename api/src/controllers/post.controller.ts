@@ -3,6 +3,7 @@ import { cloudinary } from "../middleware/cloudinary";
 import fs from "fs";
 import postModel from "../models/post.model";
 import commentModel from "../models/comment.model";
+import userModel from "../models/user.model";
 
 export const createPost = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -62,18 +63,50 @@ export const createPost = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
+// export const getPosts = async (req: Request, res: Response): Promise<any> => {
+//   try {
+//     const posts = await postModel
+//       .find()
+//       .populate("author", "avatar firstName lastName -_id")
+//       .populate("comments.userId", "avatar firstName lastName ");
+//     console.log(posts);
+//     res.status(200).json(posts);
+//   } catch (error) {
+//     return res
+//       .status(500)
+//       .json({ success: false, message: "Internal Server Error", error });
+//   }
+// };
+
 export const getPosts = async (req: Request, res: Response): Promise<any> => {
   try {
+    const loggedInUserId = req.user.id;
+
+    // Step 1: Get the logged-in user's friends' IDs from the userModel
+    const user = await userModel.findById(loggedInUserId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // Step 2: Get all the posts where the author is a friend
     const posts = await postModel
-      .find()
+      .find({
+        author: { $in: user.friends }, // Filter posts where the author is in the logged-in user's friends list
+      })
       .populate("author", "avatar firstName lastName -_id")
-      .populate("comments.userId", "avatar firstName lastName ");
-    console.log(posts);
+      .populate("comments.userId", "avatar firstName lastName");
+
+    // Step 3: Send the posts as response
     res.status(200).json(posts);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal Server Error", error });
+    console.log(error); // Add error logging to diagnose issues
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error,
+    });
   }
 };
 

@@ -201,7 +201,9 @@ const Profile = () => {
               </label>
             </Box>
             <Box>
-              <Typography fontSize={35}>Bishal Raj Bhattarai</Typography>
+              <Typography
+                fontSize={35}
+              >{`${user?.firstName} ${user?.lastName}`}</Typography>
               <Typography>{user?.friends.length} Friends</Typography>
             </Box>
           </Box>

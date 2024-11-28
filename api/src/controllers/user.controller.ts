@@ -191,9 +191,120 @@ export const updateCover = async (
   }
 };
 
+export const cancelFriendRequest = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  const targetUserId = req.body.friendId;
+  const loggedInUserId = req.user.id;
+
+  try {
+    await userModel.findByIdAndUpdate(targetUserId, {
+      $pull: {
+        friendRequests: loggedInUserId,
+      },
+    });
+
+    await userModel.findByIdAndUpdate(loggedInUserId, {
+      $pull: {
+        pendingFriends: targetUserId,
+      },
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Friend Request Cancelled",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Error Canceling Friend Request.",
+      error,
+    });
+  }
+};
+
+export const removeFriend = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  const loggedInUserId = req.user.id;
+  const targetUserId = req.body.friendId;
+
+  try {
+    await userModel.findByIdAndUpdate(loggedInUserId, {
+      $pull: { friends: targetUserId },
+    });
+
+    await userModel.findByIdAndUpdate(targetUserId, {
+      $pull: { friends: loggedInUserId },
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "User Removed Successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Error Removing friend.",
+      error,
+    });
+  }
+};
+
+export const confirmFriendRequest = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  console.log("airaxa hai airaxa");
+  try {
+    const targetUserId = req.body.friendId;
+    const loggedInUserId = req.user.id;
+
+    // Prevent adding a friend request to self
+    if (loggedInUserId === targetUserId) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot Add Yourself.",
+      });
+    }
+
+    console.log("Airaxa");
+
+    const update1 = await userModel.findByIdAndUpdate(loggedInUserId, {
+      $pull: { friendRequests: targetUserId },
+    });
+    console.log("pulled from id from loggedInUser");
+    console.log(update1);
+    await userModel.findByIdAndUpdate(targetUserId, {
+      $pull: { pendingFriends: loggedInUserId },
+    });
+    await userModel.findByIdAndUpdate(targetUserId, {
+      $addToSet: { friends: loggedInUserId },
+    });
+    await userModel.findByIdAndUpdate(loggedInUserId, {
+      $addToSet: { friends: targetUserId },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Friend request confirmed successfully.",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Error confirming friend request.",
+      error,
+    });
+  }
+};
+
 export const addFriend = async (req: Request, res: Response): Promise<any> => {
   try {
-    console.log("Request ta gayp");
     const targetUserId = req.body.id;
     const loggedInUserId = req.user.id;
 
@@ -217,6 +328,7 @@ export const addFriend = async (req: Request, res: Response): Promise<any> => {
       .status(200)
       .json({ success: true, message: "Friend request sent successfully." });
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       success: false,
       message: "Error sending friend request.",

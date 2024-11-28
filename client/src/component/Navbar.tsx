@@ -103,7 +103,7 @@ const Navbar = () => {
             <img
               onClick={() => navigate("/")}
               style={{ width: "70px", height: "70px", cursor: "pointer" }}
-              src={`${import.meta.env.VITE_PUBLIC_URL}facebook.webp`}
+              src={`${import.meta.env.VITE_PUBLIC_URL}/facebook.webp`}
               alt="logo"
             />
             <Box sx={{ display: { xs: "none", md: "block" } }}>

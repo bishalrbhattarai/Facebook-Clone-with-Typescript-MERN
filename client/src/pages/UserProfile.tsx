@@ -16,6 +16,7 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import SmsIcon from "@mui/icons-material/Sms";
 import PersonRemoveAlt1RoundedIcon from "@mui/icons-material/PersonRemoveAlt1Rounded";
 const button = { color: "white" };
+import CheckIcon from "@mui/icons-material/Check";
 
 const Profile = () => {
   const { id } = useParams<{ id: string }>();
@@ -58,10 +59,40 @@ const Profile = () => {
 
   const handleRemoveFriend = async () => {
     try {
+      setLoading(true);
       await apiClient.post("/user/remove-friend", { friendId: id });
       fetchUserProfile(); // Update UI to reflect removal
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.error("Error removing friend:", error);
+    }
+  };
+
+  const handleCancelFriendRequest = async () => {
+    try {
+      setLoading(true);
+      await apiClient.post("/user/cancel-friend-request", { friendId: id });
+      fetchUserProfile(); // Update UI to reflect removal
+      setLoading(true);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+      console.log("Error Canceling Friend Request", error);
+    }
+  };
+
+  const handleConfirmRequest = async () => {
+    try {
+      console.log("done");
+      setLoading(true);
+      await apiClient.post("/user/confirm-friend-request", { friendId: id });
+      fetchUserProfile(); // Update UI to reflect removal
+      setLoading(true);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+      console.log("Error Confirming Friend Request", error);
     }
   };
 
@@ -140,9 +171,11 @@ const Profile = () => {
               <Typography>{user.friends.length} Friends</Typography>
               <Box display="flex">
                 {user.friends.slice(0, 4).map((friend: any, index: number) => (
-                  <Avatar key={index} sx={{ height: "30px", width: "30px" }}>
-                    {friend[0]}
-                  </Avatar>
+                  <Avatar
+                    src={friend[0]}
+                    key={index}
+                    sx={{ height: "30px", width: "30px" }}
+                  />
                 ))}
               </Box>
             </Box>
@@ -150,7 +183,16 @@ const Profile = () => {
           <Box sx={{ display: "flex", gap: 3 }}>
             {isFriend ? (
               <>
-                <Button variant="contained" sx={{ bgcolor: "grey" }}>
+                <Button
+                  startIcon={
+                    <>
+                      <CheckIcon />
+                    </>
+                  }
+                  variant="contained"
+                  color="success"
+                  sx={{ bgcolor: "success" }}
+                >
                   Friends
                 </Button>
                 <Button
@@ -163,7 +205,11 @@ const Profile = () => {
               </>
             ) : isPending ? (
               <>
-                <Button variant="contained" color="success">
+                <Button
+                  onClick={handleConfirmRequest}
+                  variant="contained"
+                  color="success"
+                >
                   Confirm Request
                 </Button>
 
@@ -173,6 +219,7 @@ const Profile = () => {
               </>
             ) : isRequested ? (
               <Button
+                onClick={handleCancelFriendRequest}
                 startIcon={<PersonRemoveAlt1RoundedIcon />}
                 variant="contained"
                 color="primary"
