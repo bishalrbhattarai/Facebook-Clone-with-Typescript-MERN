@@ -59,7 +59,7 @@ const Profile = () => {
   const handleRemoveFriend = async () => {
     try {
       await apiClient.post("/user/remove-friend", { friendId: id });
-      setIsFriend(false); // Update UI to reflect removal
+      fetchUserProfile(); // Update UI to reflect removal
     } catch (error) {
       console.error("Error removing friend:", error);
     }

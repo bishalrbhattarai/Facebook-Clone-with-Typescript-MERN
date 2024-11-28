@@ -8,7 +8,7 @@ import fs from "fs";
 import { cloudinary } from "./middleware/cloudinary";
 
 dotenv.config();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 import connection from "./db/connection";
 app.use(
   cors({

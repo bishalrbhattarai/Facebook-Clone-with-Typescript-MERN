@@ -3,7 +3,7 @@ import userModel, { UserDocument } from "../models/user.model";
 import { z } from "zod";
 import jwt from "jsonwebtoken";
 import mongoose, { MongooseError } from "mongoose";
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = "secret_key";
 
 const SignUpSchema = z.object({
   firstName: z.string({
@@ -45,7 +45,7 @@ export const login = async (
   next: NextFunction
 ): Promise<any> => {
   console.log("Yo chai login controller ma clg ho hai token ko value");
-  console.log(req.cookies.token);
+  // console.log(req.cookies.token);  mfrfnffffnqepfnfd
 
   // console.log(token);
 
