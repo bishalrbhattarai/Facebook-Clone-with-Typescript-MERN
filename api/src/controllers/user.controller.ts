@@ -322,6 +322,55 @@ export const confirmFriendRequest = async (
   }
 };
 
+export const rejectFriendRequest = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  console.log("airaxa hai airaxa");
+  try {
+    const targetUserId = req.body.friendId;
+    const loggedInUserId = req.user.id;
+
+    // Prevent adding a friend request to self
+    if (loggedInUserId === targetUserId) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot Add Yourself.",
+      });
+    }
+
+    console.log("Airaxa");
+
+    const update1 = await userModel.findByIdAndUpdate(loggedInUserId, {
+      $pull: { friendRequests: targetUserId },
+    });
+    console.log("pulled from id from loggedInUser");
+    console.log(update1);
+    await userModel.findByIdAndUpdate(targetUserId, {
+      $pull: { pendingFriends: loggedInUserId },
+    });
+
+    const user = await userModel.findById(loggedInUserId, {
+      password: 0,
+      createdAt: 0,
+      updatedAt: 0,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Friend request rejected successfully.",
+      user,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Error confirming friend request.",
+      error,
+    });
+  }
+};
+
 export const addFriend = async (req: Request, res: Response): Promise<any> => {
   try {
     const targetUserId = req.body.id;

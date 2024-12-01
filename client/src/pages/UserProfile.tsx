@@ -29,6 +29,17 @@ const Profile = () => {
   const [isPending, setIsPending] = useState(false);
   const [isRequested, setIsRequested] = useState(false);
 
+  const fetchLoggedInUserProfile = async () => {
+    try {
+      const { data } = await apiClient.post("/user/me", {
+        id: loggedInUser?._id,
+      }); // Assuming `/user/me` returns logged-in user's data
+      dispatch(setUser(data.user));
+    } catch (error) {
+      console.error("Error fetching logged-in user profile:", error);
+    }
+  };
+
   const fetchUserProfile = async () => {
     try {
       setLoading(true);
@@ -91,6 +102,24 @@ const Profile = () => {
       console.log(error);
       setLoading(false);
       console.log("Error Canceling Friend Request", error);
+    }
+  };
+
+  const handleRejectRequest = async () => {
+    try {
+      console.log("done");
+      setLoading(true);
+      const { data } = await apiClient.post("/user/reject-friend-request", {
+        friendId: id,
+      });
+      dispatch(setUser(data.user));
+
+      fetchUserProfile(); // Update UI to reflect removal
+      setLoading(true);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+      console.log("Error Confirming Friend Request", error);
     }
   };
 
@@ -229,7 +258,11 @@ const Profile = () => {
                   Confirm Request
                 </Button>
 
-                <Button variant="contained" color="error">
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleRejectRequest}
+                >
                   Reject Request
                 </Button>
               </>

@@ -7,6 +7,7 @@ import {
   addFriend,
   cancelFriendRequest,
   confirmFriendRequest,
+  rejectFriendRequest,
   removeFriend,
 } from "../controllers/user.controller";
 import { auth } from "../middleware/auth";
@@ -22,5 +23,6 @@ router.post("/cancel-friend-request", auth, cancelFriendRequest);
 router.post("/remove-friend", auth, removeFriend);
 
 router.post("/confirm-friend-request", auth, confirmFriendRequest);
+router.post("/reject-friend-request", auth, rejectFriendRequest);
 
 export default router;
