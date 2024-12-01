@@ -14,7 +14,17 @@ import {
 import SearchTwoToneIcon from "@mui/icons-material/SearchTwoTone";
 import MoreHorizTwoToneIcon from "@mui/icons-material/MoreHorizTwoTone";
 import CircleIcon from "@mui/icons-material/Circle";
+import { useSocket } from "../context/socketContext";
+import { useEffect } from "react";
 const Right = () => {
+  const { socket } = useSocket();
+
+  useEffect(() => {
+    socket?.emit("server", "Connection built");
+    socket?.on("joined", (data) => {
+      console.log(data);
+    });
+  }, [socket]);
   return (
     <>
       <Box

@@ -5,24 +5,46 @@ import CreateAccount from "./pages/CreateAccount";
 import Profile from "./pages/Profile";
 import Layout from "./Layout";
 import UserProfile from "./pages/UserProfile";
+import { SocketProvider } from "./context/socketContext";
 
 function App() {
   return (
-    <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route path="profile" element={<Profile />} />
-            <Route path="profile/:id" element={<UserProfile />} />
+    <BrowserRouter>
+      <Routes>
+        {/* Layout wrapper route for authenticated pages */}
+        <Route path="/" element={<Layout />}>
+          {/* Wrap only the routes that need the socket context */}
+          <Route
+            index
+            element={
+              <SocketProvider>
+                <Home />
+              </SocketProvider>
+            }
+          />
+          <Route
+            path="profile"
+            element={
+              <SocketProvider>
+                <Profile />
+              </SocketProvider>
+            }
+          />
+          <Route
+            path="profile/:id"
+            element={
+              <SocketProvider>
+                <UserProfile />
+              </SocketProvider>
+            }
+          />
+        </Route>
 
-            <Route path="/" element={<Home />} />
-          </Route>
-
-          <Route path="/login" element={<Login />} />
-          <Route path="/create-account" element={<CreateAccount />} />
-        </Routes>
-      </BrowserRouter>
-    </>
+        {/* These routes don't need the SocketProvider */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/create-account" element={<CreateAccount />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

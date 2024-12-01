@@ -253,7 +253,7 @@ const Navbar = () => {
               sx={{ width: 60, height: 60 }}
             />
             <Box>
-              <Typography fontWeight="bold">Bishal Raj Bhattarai</Typography>
+              <Typography fontWeight="bold">{`${user?.firstName} ${user?.lastName} `}</Typography>
               <Typography fontWeight="light" color="gray">
                 See your profile
               </Typography>

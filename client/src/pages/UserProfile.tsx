@@ -9,7 +9,7 @@ import {
 import CellTowerIcon from "@mui/icons-material/CellTower";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { useParams } from "react-router-dom";
-import { useAppSelector } from "../hooks/hook";
+import { useAppDispatch, useAppSelector } from "../hooks/hook";
 import { useState, useEffect } from "react";
 import apiClient from "../http/apiClient";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
@@ -17,11 +17,13 @@ import SmsIcon from "@mui/icons-material/Sms";
 import PersonRemoveAlt1RoundedIcon from "@mui/icons-material/PersonRemoveAlt1Rounded";
 const button = { color: "white" };
 import CheckIcon from "@mui/icons-material/Check";
+import { setUser } from "../redux/slices/userSlice";
 
 const Profile = () => {
+  const dispatch = useAppDispatch();
   const { id } = useParams<{ id: string }>();
   const loggedInUser = useAppSelector((state) => state.user.user);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUserr] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [isFriend, setIsFriend] = useState(false);
   const [isPending, setIsPending] = useState(false);
@@ -31,7 +33,7 @@ const Profile = () => {
     try {
       setLoading(true);
       const { data } = await apiClient.post("/user", { id });
-      setUser(data.user);
+      setUserr(data.user);
       setIsFriend(data.user.friends.includes(loggedInUser?._id));
       setIsPending(data.user.pendingFriends.includes(loggedInUser?._id));
       setIsRequested(data.user.friendRequests.includes(loggedInUser?._id));
@@ -49,7 +51,9 @@ const Profile = () => {
   const handleAddFriend = async () => {
     try {
       // return;
-      await apiClient.post("/user/add-friend", { id });
+      const { data } = await apiClient.post("/user/add-friend", { id });
+      console.log(data);
+      dispatch(setUser(data.user));
       fetchUserProfile();
       // setIsRequested(true); // Update UI to show request sent
     } catch (error) {
@@ -60,7 +64,11 @@ const Profile = () => {
   const handleRemoveFriend = async () => {
     try {
       setLoading(true);
-      await apiClient.post("/user/remove-friend", { friendId: id });
+      const { data } = await apiClient.post("/user/remove-friend", {
+        friendId: id,
+      });
+      console.log(data);
+      dispatch(setUser(data.user));
       fetchUserProfile(); // Update UI to reflect removal
       setLoading(false);
     } catch (error) {
@@ -72,7 +80,11 @@ const Profile = () => {
   const handleCancelFriendRequest = async () => {
     try {
       setLoading(true);
-      await apiClient.post("/user/cancel-friend-request", { friendId: id });
+      const { data } = await apiClient.post("/user/cancel-friend-request", {
+        friendId: id,
+      });
+      dispatch(setUser(data.user));
+
       fetchUserProfile(); // Update UI to reflect removal
       setLoading(true);
     } catch (error) {
@@ -86,7 +98,11 @@ const Profile = () => {
     try {
       console.log("done");
       setLoading(true);
-      await apiClient.post("/user/confirm-friend-request", { friendId: id });
+      const { data } = await apiClient.post("/user/confirm-friend-request", {
+        friendId: id,
+      });
+      dispatch(setUser(data.user));
+
       fetchUserProfile(); // Update UI to reflect removal
       setLoading(true);
     } catch (error) {

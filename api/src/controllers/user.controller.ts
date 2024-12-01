@@ -211,9 +211,14 @@ export const cancelFriendRequest = async (
       },
     });
 
+    const user = await userModel.findById(loggedInUserId, {
+      password: 0,
+    });
+
     res.status(201).json({
       success: true,
       message: "Friend Request Cancelled",
+      user,
     });
   } catch (error) {
     console.log(error);
@@ -241,9 +246,16 @@ export const removeFriend = async (
       $pull: { friends: loggedInUserId },
     });
 
+    const user = await userModel.findById(loggedInUserId, {
+      password: 0,
+      createdAt: 0,
+      updatedAt: 0,
+    });
+
     res.status(201).json({
       success: true,
       message: "User Removed Successfully",
+      user,
     });
   } catch (error) {
     console.log(error);
@@ -289,9 +301,16 @@ export const confirmFriendRequest = async (
       $addToSet: { friends: targetUserId },
     });
 
+    const user = await userModel.findById(loggedInUserId, {
+      password: 0,
+      createdAt: 0,
+      updatedAt: 0,
+    });
+
     res.status(200).json({
       success: true,
       message: "Friend request confirmed successfully.",
+      user,
     });
   } catch (error) {
     console.log(error);
@@ -324,9 +343,17 @@ export const addFriend = async (req: Request, res: Response): Promise<any> => {
       $addToSet: { pendingFriends: targetUserId },
     });
 
-    res
-      .status(200)
-      .json({ success: true, message: "Friend request sent successfully." });
+    const user = await userModel.findById(loggedInUserId, {
+      password: 0,
+      createdAt: 0,
+      updatedAt: 0,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Friend request sent successfully.",
+      user,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({

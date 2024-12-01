@@ -3,9 +3,14 @@ import Post from "./Post";
 import CreatePost from "./CreatePost";
 import apiClient from "../http/apiClient";
 import { useState, useEffect } from "react";
+import { useSocket } from "../context/socketContext";
+import { useAppSelector } from "../hooks/hook";
 
 const Feed = () => {
+  const user = useAppSelector((state) => state.user);
+
   const [posts, setPosts] = useState<any[]>([]);
+  const { socket } = useSocket();
 
   const fetchPosts = async () => {
     try {
@@ -15,6 +20,14 @@ const Feed = () => {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    socket?.emit("server", "i am connected", {
+      auth: {
+        id: user.user?._id,
+      },
+    });
+  }, [socket]);
 
   useEffect(() => {
     fetchPosts();
